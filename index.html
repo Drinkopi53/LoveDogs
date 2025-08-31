@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galactic Paws - Makanan Anjing Masa Depan</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="main-header">
+        <div class="container">
+            <a href="#" class="logo">Galactic Paws</a>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="#products">Produk</a></li>
+                    <li><a href="#testimonials">Testimoni</a></li>
+                    <li><a href="#about">Tentang Kami</a></li>
+                </ul>
+            </nav>
+            <button class="cart-toggle-btn">Keranjang (0)</button>
+        </div>
+    </header>
+
+    <main>
+        <section id="hero" class="hero-section">
+            <div class="container">
+                <div class="hero-content">
+                    <h1 class="hero-title">Nutrisi Terbaik dari Ujung Galaksi.</h1>
+                    <p class="hero-subtitle">Berikan anjing Anda kekuatan bintang dengan formula makanan kami yang revolusioner.</p>
+                    <a href="#products" class="btn btn-primary">Jelajahi Produk</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="products" class="product-section fade-in-section">
+            <div class="container">
+                <h2 class="section-title">Produk Unggulan Kami</h2>
+
+                <div class="filter-controls">
+                    <button class="filter-btn active" data-category="all">Semua</button>
+                    <button class="filter-btn" data-category="puppy">Anak Anjing</button>
+                    <button class="filter-btn" data-category="adult">Dewasa</button>
+                    <button class="filter-btn" data-category="senior">Senior</button>
+                    <button class="filter-btn" data-category="treats">Camilan</button>
+                </div>
+
+                <div id="product-list" class="product-grid">
+                    <!-- Kartu produk akan dimuat di sini oleh JavaScript -->
+                </div>
+            </div>
+        </section>
+
+        <section id="testimonials" class="testimonials-section fade-in-section">
+            <div class="container">
+                <h2 class="section-title">Apa Kata Pelanggan Setia Kami</h2>
+                <div class="testimonial-carousel">
+                    <div class="testimonial-wrapper">
+                        <!-- Slide 1 -->
+                        <div class="testimonial-slide">
+                            <p class="testimonial-text">"Sejak anjing saya, Bruno, makan Galactic Paws, energinya luar biasa! Bulunya juga lebih berkilau. Sangat direkomendasikan!"</p>
+                            <p class="testimonial-author">- Rina & Bruno</p>
+                        </div>
+                        <!-- Slide 2 -->
+                        <div class="testimonial-slide">
+                            <p class="testimonial-text">"Produk grain-free mereka adalah penyelamat. Anjing saya punya alergi dan sekarang masalahnya hilang. Terima kasih Galactic Paws!"</p>
+                            <p class="testimonial-author">- Budi Santoso</p>
+                        </div>
+                        <!-- Slide 3 -->
+                        <div class="testimonial-slide">
+                            <p class="testimonial-text">"Pengirimannya cepat dan anjing-anjing senior saya suka sekali varian Nebula Nutrition. Mereka jadi lebih aktif sekarang."</p>
+                            <p class="testimonial-author">- Maria</p>
+                        </div>
+                    </div>
+                    <button class="carousel-btn prev-btn">&lt;</button>
+                    <button class="carousel-btn next-btn">&gt;</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="cart-overlay" class="cart-overlay"></div>
+    <div id="cart-panel" class="cart-panel">
+        <div class="cart-header">
+            <h2>Keranjang Anda</h2>
+            <button id="close-cart-btn" class="close-cart-btn">&times;</button>
+        </div>
+        <div id="cart-items" class="cart-items">
+            <!-- Item keranjang akan dimuat di sini -->
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span>Total:</span>
+                <span id="cart-total-price">Rp 0</span>
+            </div>
+            <a href="#" class="btn btn-primary checkout-btn">Lanjut ke Checkout</a>
+        </div>
+    </div>
+
+    <script src="js/script.js"></script>
+</body>
+</html>
