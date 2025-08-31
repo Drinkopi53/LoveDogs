@@ -5,7 +5,7 @@ Proyek ini adalah templat situs web e-commerce dengan tema modern dan futuristik
 ## Fitur Utama
 
 -   **Bagian Hero Dinamis**: Bagian hero layar penuh yang menarik secara visual untuk menangkap perhatian pengguna.
--   **Daftar Produk Dinamis**: Produk dimuat secara asinkron dari file `products.json`, membuat daftar produk mudah untuk dikelola dan diperluas.
+-   **Daftar Produk**: Daftar produk yang lengkap dan mudah dikelola langsung dari dalam kode JavaScript.
 -   **Filter Produk Interaktif**: Pengguna dapat memfilter produk berdasarkan kategori (Anak Anjing, Dewasa, Senior, Camilan) dengan antarmuka yang halus dan interaktif.
 -   **Carousel Testimoni**: Carousel JavaScript kustom yang ringan untuk menampilkan testimoni pelanggan tanpa membuat halaman penuh sesak.
 -   **Keranjang Belanja Geser (Slide-In Cart)**: Keranjang belanja berfitur lengkap yang muncul dari samping. Pengguna dapat:
@@ -23,18 +23,17 @@ Proyek ini adalah templat situs web e-commerce dengan tema modern dan futuristik
     -   **Flexbox & Grid**: Untuk manajemen tata letak yang modern dan efisien.
     -   **CSS Variables**: Untuk tema yang konsisten dan mudah dirawat.
 -   **JavaScript (ES6+)**: Untuk semua fungsionalitas dinamis.
-    -   **Fetch API**: Untuk memuat data produk secara asinkron.
     -   **DOM Manipulation**: Untuk membuat dan memperbarui konten secara dinamis.
     -   **IntersectionObserver**: Untuk animasi berbasis scroll yang efisien.
 
 ## Cara Menjalankan
 
-Ini adalah situs web statis yang dibangun dengan HTML, CSS, dan JavaScript murni. Tidak ada alat build yang diperlukan.
+Proyek ini sangat mudah dijalankan dan tidak memerlukan instalasi atau server web.
 
-1.  Clone repositori ini ke mesin lokal Anda.
-2.  Buka file `index.html` di browser web Anda.
+1.  Unduh semua file proyek ini ke komputer Anda.
+2.  Cukup klik dua kali pada file `index.html` untuk membukanya langsung di browser favorit Anda.
 
-Selesai! Situs web seharusnya berfungsi penuh.
+Situs web akan segera berfungsi dengan baik.
 
 ---
 *Proyek ini dikembangkan oleh Jules, seorang insinyur perangkat lunak AI.*
