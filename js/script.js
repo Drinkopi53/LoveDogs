@@ -1,6 +1,15 @@
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', () => {
+    // --- STATIC DATA ---
+    const productData = [
+        { "id": 1, "name": "Stardust Puppy Chow", "tagline": "Energi kosmik untuk anak anjing.", "price": 150000, "image": "images/product_placeholder.png", "category": "puppy" },
+        { "id": 2, "name": "Meteor Meat Adult", "tagline": "Kekuatan meteor untuk anjing dewasa.", "price": 250000, "image": "images/product_placeholder.png", "category": "adult" },
+        { "id": 3, "name": "Galaxy Grain-Free", "tagline": "Diet bebas biji-bijian dari galaksi lain.", "price": 280000, "image": "images/product_placeholder.png", "category": "adult" },
+        { "id": 4, "name": "Nebula Nutrition Senior", "tagline": "Nutrisi seimbang untuk anjing senior.", "price": 260000, "image": "images/product_placeholder.png", "category": "senior" },
+        { "id": 5, "name": "Cosmic Crunchies", "tagline": "Camilan renyah untuk semua usia.", "price": 80000, "image": "images/product_placeholder.png", "category": "treats" }
+    ];
+
     // --- STATE ---
-    let allProducts = [];
+    let allProducts = productData;
     let cart = [];
 
     // --- SELECTORS ---
@@ -42,7 +51,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         } else {
             cartItemsContainerEl.innerHTML = cart.map(item => {
                 const product = allProducts.find(p => p.id === item.id);
-                if (!product) return ''; // Should not happen
+                if (!product) return '';
                 return `
                     <div class="cart-item" data-id="${item.id}">
                         <img src="${product.image}" alt="${product.name}" class="cart-item__image">
@@ -78,7 +87,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         const target = e.target;
         const productId = parseInt(target.dataset.id);
         if (isNaN(productId)) return;
-
         const itemInCart = cart.find(i => i.id === productId);
         if (!itemInCart) return;
 
@@ -96,30 +104,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         updateCartUI();
     };
 
-    const loadProducts = async () => {
+    const loadProducts = () => {
         if (!productListEl) return;
-        productListEl.innerHTML = '<p>Loading products...</p>';
-        try {
-            const response = await fetch('data/products.json');
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-            const products = await response.json();
-            allProducts = products; // Store products in state
-
-            productListEl.innerHTML = products.map(product => `
-                <div class="product-card" data-id="${product.id}" data-category="${product.category}" style="display: flex;">
-                    <img src="${product.image}" alt="${product.name}" class="product-card__image">
-                    <div class="product-card__content">
-                        <h3 class="product-card__name">${product.name}</h3>
-                        <p class="product-card__tagline">${product.tagline}</p>
-                        <p class="product-card__price">Rp ${product.price.toLocaleString('id-ID')}</p>
-                        <button class="btn btn-primary add-to-cart-btn" data-id="${product.id}">Tambah ke Keranjang</button>
-                    </div>
+        productListEl.innerHTML = allProducts.map(product => `
+            <div class="product-card" data-id="${product.id}" data-category="${product.category}" style="display: flex;">
+                <img src="${product.image}" alt="${product.name}" class="product-card__image">
+                <div class="product-card__content">
+                    <h3 class="product-card__name">${product.name}</h3>
+                    <p class="product-card__tagline">${product.tagline}</p>
+                    <p class="product-card__price">Rp ${product.price.toLocaleString('id-ID')}</p>
+                    <button class="btn btn-primary add-to-cart-btn" data-id="${product.id}">Tambah ke Keranjang</button>
                 </div>
-            `).join('');
-        } catch (error) {
-            console.error("Could not load products:", error);
-            productListEl.innerHTML = '<p style="color: red;">Gagal memuat produk.</p>';
-        }
+            </div>
+        `).join('');
     };
 
     const initProductFilter = () => {
@@ -159,6 +156,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         prevBtn.addEventListener('click', () => goToSlide((currentSlide - 1 + totalSlides) % totalSlides));
     };
 
+    const initScrollAnimations = () => {
+        const sections = document.querySelectorAll('.fade-in-section');
+        if (!sections.length) return;
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+        sections.forEach(section => observer.observe(section));
+    };
+
     // --- EVENT LISTENERS ---
     if (cartToggleBtnEl) cartToggleBtnEl.addEventListener('click', openCart);
     if (closeCartBtnEl) closeCartBtnEl.addEventListener('click', closeCart);
@@ -174,25 +185,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // --- INITIALIZATION ---
-    const initScrollAnimations = () => {
-        const sections = document.querySelectorAll('.fade-in-section');
-        if (!sections.length) return;
-
-        const observer = new IntersectionObserver((entries, observer) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('is-visible');
-                    observer.unobserve(entry.target);
-                }
-            });
-        }, { threshold: 0.1 });
-
-        sections.forEach(section => observer.observe(section));
-    };
-
-    await loadProducts();
+    loadProducts();
     initProductFilter();
     initTestimonialCarousel();
     initScrollAnimations();
-    updateCartUI(); // Initial UI update
+    updateCartUI();
 });
