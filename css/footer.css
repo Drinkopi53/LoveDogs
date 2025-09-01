@@ -1,0 +1,101 @@
+.site-footer {
+    background-color: #212529;
+    color: #adb5bd;
+    padding: 3rem 1rem 1rem;
+    position: relative;
+    overflow-x: hidden;
+    font-family: 'Lato', sans-serif;
+}
+
+.footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 2rem;
+}
+
+.site-footer h3 {
+    color: #FFFFFF;
+    font-family: 'Poppins', sans-serif;
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+}
+
+.footer-about p {
+    line-height: 1.8;
+}
+
+.footer-links ul {
+    list-style: none;
+    padding: 0;
+}
+.footer-links li {
+    margin-bottom: 0.5rem;
+}
+
+.footer-links a {
+    color: #adb5bd;
+    text-decoration: none;
+    transition: color 0.3s, padding-left 0.3s;
+}
+
+.footer-links a:hover {
+    color: #FFFFFF;
+    padding-left: 5px;
+}
+
+.footer-contact p {
+    margin-bottom: 0.5rem;
+}
+
+.footer-social a {
+    display: inline-block;
+    margin-right: 1rem;
+    opacity: 0.7;
+    transition: opacity 0.3s, transform 0.3s;
+}
+
+.footer-social a:hover {
+    opacity: 1;
+    transform: translateY(-3px);
+}
+
+.footer-social img {
+    width: 28px;
+    height: 28px;
+    filter: invert(1);
+}
+
+.footer-bottom {
+    text-align: center;
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #495057;
+}
+
+.running-dog-container {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 40px;
+    pointer-events: none;
+}
+
+.running-dog {
+    position: absolute;
+    bottom: 5px;
+    height: 35px;
+    color: #495057;
+    animation: run-across 12s linear infinite;
+}
+
+@keyframes run-across {
+    from {
+        transform: translateX(-100px);
+    }
+    to {
+        transform: translateX(100vw);
+    }
+}

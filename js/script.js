@@ -370,6 +370,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 <button id="logout-btn" class="btn-logout">Logout</button>
             `;
         }
+        const yearSpan = document.getElementById('copyright-year');
+        if (yearSpan) {
+            yearSpan.textContent = new Date().getFullYear();
+        }
     };
     const initProductFilter = () => {
         const filterContainer = document.querySelector('.filter-controls');
