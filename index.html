@@ -150,6 +150,10 @@
             <!-- Item keranjang akan dimuat di sini -->
         </div>
         <div class="cart-footer">
+            <div class="discount-section">
+                <button id="claim-discount-btn" class="btn">Claim Diskon</button>
+                <div id="discount-display"></div>
+            </div>
             <div class="cart-total">
                 <span>Total:</span>
                 <span id="cart-total-price">Rp 0</span>
@@ -158,6 +162,7 @@
         </div>
     </div>
 
+    <div id="discount-popup" class="discount-popup"></div>
     <div id="checkout-loader-overlay" class="loader-overlay">
         <div class="loading-container">
             <div class="paw-print-container">
