@@ -103,21 +103,60 @@ h1, h2, h3 {
     box-shadow: var(--shadow-md);
 }
 
-.cart-toggle-btn {
-    background-color: transparent;
-    border: 2px solid var(--color-accent);
-    color: var(--color-accent);
-    padding: 10px 20px;
-    border-radius: 50px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-family: var(--font-heading);
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
 }
 
-.cart-toggle-btn:hover {
-    background-color: var(--color-accent);
-    color: var(--color-white);
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.user-info span {
+    font-weight: 600;
+}
+
+.btn-logout {
+    background: #e03131;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: var(--font-heading);
+    font-weight: 600;
+    transition: background-color 0.3s;
+}
+
+.btn-logout:hover {
+    background: #c92a2a;
+}
+
+.cart-toggle-btn {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--color-text);
+}
+
+.cart-toggle-btn:hover .cart-icon {
+    color: var(--color-accent);
+}
+
+.cart-icon {
+    font-size: 1.8rem;
+    transition: color 0.3s;
+}
+
+.cart-count {
+    font-weight: 600;
+    font-family: var(--font-heading);
 }
 
 /* Hero Section */
