@@ -59,6 +59,87 @@ document.addEventListener('DOMContentLoaded', () => {
     const formTitle = addProductModal.querySelector('h2');
     const formSubmitBtn = addProductForm.querySelector('button[type="submit"]');
     const userInfoEl = document.getElementById('user-info');
+    const checkoutBtn = document.querySelector('.checkout-btn');
+    const checkoutLoaderOverlay = document.getElementById('checkout-loader-overlay');
+
+    // --- CHECKOUT LOGIC ---
+    const handleCheckout = (e) => {
+        e.preventDefault();
+        if (cart.length === 0) {
+            alert('Keranjang Anda kosong. Silakan tambahkan produk terlebih dahulu.');
+            return;
+        }
+
+        checkoutLoaderOverlay.classList.add('active');
+
+        setTimeout(() => {
+            generatePDFReceipt();
+            cart = [];
+            updateCartUI();
+            checkoutLoaderOverlay.classList.remove('active');
+            alert('Checkout berhasil! Terima kasih telah berbelanja.');
+        }, 3000);
+    };
+
+    const generatePDFReceipt = () => {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(20);
+        doc.text('Galactic Paws', 105, 20, null, null, 'center');
+
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        doc.text('Struk Pembelian', 105, 28, null, null, 'center');
+
+        const transactionDate = new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
+        const transactionTime = new Date().toLocaleTimeString('id-ID');
+        const transactionId = Date.now();
+
+        doc.setFontSize(10);
+        doc.text(`No. Transaksi: ${transactionId}`, 15, 40);
+        doc.text(`Tanggal: ${transactionDate}, ${transactionTime}`, 15, 45);
+        doc.text(`Pelanggan: ${currentUser.username}`, 15, 50);
+
+        doc.setLineWidth(0.5);
+        doc.line(15, 55, 195, 55);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Qty', 20, 60);
+        doc.text('Nama Produk', 40, 60);
+        doc.text('Harga', 120, 60);
+        doc.text('Subtotal', 165, 60);
+        doc.line(15, 63, 195, 63);
+
+        doc.setFont('helvetica', 'normal');
+        let yPos = 70;
+        let totalPrice = 0;
+
+        cart.forEach(item => {
+            const product = allProducts.find(p => p.id === item.id);
+            if (product) {
+                const subtotal = item.quantity * product.price;
+                totalPrice += subtotal;
+                doc.text(item.quantity.toString(), 20, yPos);
+                doc.text(product.name, 40, yPos);
+                doc.text(`Rp ${product.price.toLocaleString('id-ID')}`, 120, yPos);
+                doc.text(`Rp ${subtotal.toLocaleString('id-ID')}`, 165, yPos);
+                yPos += 7;
+            }
+        });
+
+        doc.line(15, yPos, 195, yPos);
+        yPos += 7;
+        doc.setFont('helvetica', 'bold');
+        doc.text('Total Harga:', 120, yPos);
+        doc.text(`Rp ${totalPrice.toLocaleString('id-ID')}`, 165, yPos);
+
+        yPos += 15;
+        doc.setFont('helvetica', 'italic');
+        doc.text('Terima kasih telah berbelanja di Galactic Paws!', 105, yPos, null, null, 'center');
+
+        doc.save(`nota-galactic-paws-${transactionId}.pdf`);
+    };
 
     // --- MODAL & UI FUNCTIONS ---
     const openAddEditModal = (productId = null) => {
@@ -324,6 +405,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
         }
+
+        if (checkoutBtn) checkoutBtn.addEventListener('click', handleCheckout);
     };
 
     // --- INITIALIZATION ---
