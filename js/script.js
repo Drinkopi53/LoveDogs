@@ -1,4 +1,12 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // --- AUTHENTICATION CHECK ---
+    const currentUserJSON = sessionStorage.getItem('galacticPaws.currentUser');
+    if (!currentUserJSON) {
+        window.location.replace('login.html');
+        return;
+    }
+    const currentUser = JSON.parse(currentUserJSON);
+
     // --- STATIC DATA (Default Fallback) ---
     const productData = [
         { "id": 1, "name": "Stardust Puppy Chow", "tagline": "Energi kosmik untuk anak anjing.", "price": 150000, "image": "images/product_placeholder.png", "category": "puppy" },
@@ -36,6 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const cartOverlayEl = document.getElementById('cart-overlay');
     const cartItemsContainerEl = document.getElementById('cart-items');
     const cartToggleBtnEl = document.querySelector('.cart-toggle-btn');
+    const cartCountEl = document.querySelector('.cart-count');
     const closeCartBtnEl = document.getElementById('close-cart-btn');
     const cartTotalPriceEl = document.getElementById('cart-total-price');
     const addProductBtn = document.getElementById('add-product-btn');
@@ -49,8 +58,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const readModalContent = document.getElementById('read-modal-content');
     const formTitle = addProductModal.querySelector('h2');
     const formSubmitBtn = addProductForm.querySelector('button[type="submit"]');
+    const userInfoEl = document.getElementById('user-info');
 
-    // --- MODAL FUNCTIONS ---
+    // --- MODAL & UI FUNCTIONS ---
     const openAddEditModal = (productId = null) => {
         if (productId) {
             currentlyEditingId = productId;
@@ -93,17 +103,17 @@ document.addEventListener('DOMContentLoaded', () => {
         readProductModal.classList.remove('active');
         readProductModalOverlay.classList.remove('active');
     };
-
-    // --- CART FUNCTIONS ---
     const openCart = () => { if(cartPanelEl) cartPanelEl.classList.add('active'); if(cartOverlayEl) cartOverlayEl.classList.add('active'); };
     const closeCart = () => { if(cartPanelEl) cartPanelEl.classList.remove('active'); if(cartOverlayEl) cartOverlayEl.classList.remove('active'); };
+
+    // --- CART LOGIC ---
     const updateCartTotals = () => {
         const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
         const totalPrice = cart.reduce((sum, item) => {
             const product = allProducts.find(p => p.id === item.id);
             return sum + (product ? product.price * item.quantity : 0);
         }, 0);
-        if (cartToggleBtnEl) cartToggleBtnEl.textContent = `Keranjang (${totalItems})`;
+        if (cartCountEl) cartCountEl.textContent = `(${totalItems})`;
         if (cartTotalPriceEl) cartTotalPriceEl.textContent = `Rp ${totalPrice.toLocaleString('id-ID')}`;
     };
     const updateCartUI = () => {
@@ -163,7 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateCartUI();
     };
 
-    // --- PRODUCT CRUD FUNCTIONS ---
+    // --- PRODUCT CRUD LOGIC ---
     const handleProductFormSubmit = (e) => {
         e.preventDefault();
         const formElements = addProductForm.elements;
@@ -179,7 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         if (currentlyEditingId) {
-            allProducts = allProducts.map(p => p.id === currentlyEditingId ? { ...p, ...productData } : p);
+            allProducts = allProducts.map(p => p.id === currentlyEditingId ? { ...p, ...productData, id: currentlyEditingId } : p);
         } else {
             allProducts.push({ id: Date.now(), ...productData });
         }
@@ -214,6 +224,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             </div>
         `).join('');
+    };
+    const initHeader = () => {
+        if (userInfoEl && currentUser) {
+            userInfoEl.innerHTML = `
+                <span>Hi, <strong>${currentUser.username}</strong></span>
+                <button id="logout-btn" class="btn-logout">Logout</button>
+            `;
+        }
     };
     const initProductFilter = () => {
         const filterContainer = document.querySelector('.filter-controls');
@@ -263,51 +281,61 @@ document.addEventListener('DOMContentLoaded', () => {
         }, { threshold: 0.1 });
         sections.forEach(section => observer.observe(section));
     };
+    const initEventListeners = () => {
+        if (cartToggleBtnEl) cartToggleBtnEl.addEventListener('click', openCart);
+        if (closeCartBtnEl) closeCartBtnEl.addEventListener('click', closeCart);
+        if (cartOverlayEl) cartOverlayEl.addEventListener('click', closeCart);
+        if (cartItemsContainerEl) cartItemsContainerEl.addEventListener('click', handleCartActions);
+        if (addProductBtn) addProductBtn.addEventListener('click', () => openAddEditModal());
+        if (closeModalBtn) closeModalBtn.addEventListener('click', closeAddEditModal);
+        if (addProductModalOverlay) addProductModalOverlay.addEventListener('click', closeAddEditModal);
+        if (addProductForm) addProductForm.addEventListener('submit', handleProductFormSubmit);
+        if (closeReadModalBtn) closeReadModalBtn.addEventListener('click', closeReadProductModal);
+        if (readProductModalOverlay) readProductModalOverlay.addEventListener('click', closeReadProductModal);
 
-    // --- EVENT LISTENERS ---
-    if (cartToggleBtnEl) cartToggleBtnEl.addEventListener('click', openCart);
-    if (closeCartBtnEl) closeCartBtnEl.addEventListener('click', closeCart);
-    if (cartOverlayEl) cartOverlayEl.addEventListener('click', closeCart);
-    if (cartItemsContainerEl) cartItemsContainerEl.addEventListener('click', handleCartActions);
-    if (addProductBtn) addProductBtn.addEventListener('click', () => openAddEditModal());
-    if (closeModalBtn) closeModalBtn.addEventListener('click', closeAddEditModal);
-    if (addProductModalOverlay) addProductModalOverlay.addEventListener('click', closeAddEditModal);
-    if (addProductForm) addProductForm.addEventListener('submit', handleProductFormSubmit);
-    if (closeReadModalBtn) closeReadModalBtn.addEventListener('click', closeReadProductModal);
-    if (readProductModalOverlay) readProductModalOverlay.addEventListener('click', closeReadProductModal);
+        const logoutBtn = document.getElementById('logout-btn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => {
+                sessionStorage.removeItem('galacticPaws.currentUser');
+                window.location.replace('login.html');
+            });
+        }
 
-    if (productListEl) {
-        productListEl.addEventListener('click', (e) => {
-            const card = e.target.closest('.product-card');
-            if (!card) return;
-            const productId = parseInt(card.dataset.id);
-            const addToCartBtn = e.target.closest('.add-to-cart-btn');
-            const deleteBtn = e.target.closest('.delete-product-btn');
-            const editBtn = e.target.closest('.edit-product-btn');
+        if (productListEl) {
+            productListEl.addEventListener('click', (e) => {
+                const card = e.target.closest('.product-card');
+                if (!card) return;
+                const productId = parseInt(card.dataset.id);
+                const addToCartBtn = e.target.closest('.add-to-cart-btn');
+                const deleteBtn = e.target.closest('.delete-product-btn');
+                const editBtn = e.target.closest('.edit-product-btn');
 
-            if (addToCartBtn) {
-                addToCart(productId);
-            } else if (deleteBtn) {
-                handleDeleteProduct(productId);
-            } else if (editBtn) {
-                openAddEditModal(productId);
-            } else {
-                const product = allProducts.find(p => p.id === productId);
-                if (product) {
-                    openReadProductModal(product);
+                if (addToCartBtn) {
+                    addToCart(productId);
+                } else if (deleteBtn) {
+                    handleDeleteProduct(productId);
+                } else if (editBtn) {
+                    openAddEditModal(productId);
+                } else {
+                    const product = allProducts.find(p => p.id === productId);
+                    if (product) {
+                        openReadProductModal(product);
+                    }
                 }
-            }
-        });
-    }
+            });
+        }
+    };
 
     // --- INITIALIZATION ---
     if (localStorage.getItem('galacticPaws.products') === null) {
         saveProductsToStorage(productData);
         allProducts = productData;
     }
+    initHeader();
     loadProducts();
     initProductFilter();
     initTestimonialCarousel();
     initScrollAnimations();
     updateCartUI();
+    initEventListeners();
 });
