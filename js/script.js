@@ -37,6 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let allProducts = loadProductsFromStorage();
     let cart = [];
     let currentlyEditingId = null;
+    let appliedDiscount = 0;
 
     // --- SELECTORS ---
     const productListEl = document.getElementById('product-list');
@@ -61,6 +62,31 @@ document.addEventListener('DOMContentLoaded', () => {
     const userInfoEl = document.getElementById('user-info');
     const checkoutBtn = document.querySelector('.checkout-btn');
     const checkoutLoaderOverlay = document.getElementById('checkout-loader-overlay');
+    const claimDiscountBtn = document.getElementById('claim-discount-btn');
+    const discountPopup = document.getElementById('discount-popup');
+    const discountDisplay = document.getElementById('discount-display');
+
+    // --- DISCOUNT LOGIC ---
+    const handleClaimDiscount = () => {
+        if (cart.length === 0) {
+            alert('Tambahkan produk ke keranjang terlebih dahulu untuk mengklaim diskon!');
+            return;
+        }
+        if (appliedDiscount > 0) {
+            alert('Anda sudah mengklaim diskon untuk keranjang ini.');
+            return;
+        }
+        const discounts = [5, 10, 25, 50];
+        const randomDiscount = discounts[Math.floor(Math.random() * discounts.length)];
+        appliedDiscount = randomDiscount;
+        discountPopup.textContent = `DISKON ${randomDiscount}%!`;
+        discountPopup.classList.add('show');
+        setTimeout(() => {
+            discountPopup.classList.remove('show');
+        }, 2000);
+        claimDiscountBtn.disabled = true;
+        updateCartTotals();
+    };
 
     // --- CHECKOUT LOGIC ---
     const handleCheckout = (e) => {
@@ -69,18 +95,18 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Keranjang Anda kosong. Silakan tambahkan produk terlebih dahulu.');
             return;
         }
-
         checkoutLoaderOverlay.classList.add('active');
-
         setTimeout(() => {
             generatePDFReceipt();
             cart = [];
+            appliedDiscount = 0;
+            if(claimDiscountBtn) claimDiscountBtn.disabled = false;
+            if(discountDisplay) discountDisplay.innerHTML = '';
             updateCartUI();
             checkoutLoaderOverlay.classList.remove('active');
             alert('Checkout berhasil! Terima kasih telah berbelanja.');
         }, 3000);
     };
-
     const generatePDFReceipt = () => {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
@@ -113,17 +139,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
         doc.setFont('helvetica', 'normal');
         let yPos = 70;
-        let totalPrice = 0;
+        let subtotal = 0;
 
         cart.forEach(item => {
             const product = allProducts.find(p => p.id === item.id);
             if (product) {
-                const subtotal = item.quantity * product.price;
-                totalPrice += subtotal;
+                const itemTotal = item.quantity * product.price;
+                subtotal += itemTotal;
                 doc.text(item.quantity.toString(), 20, yPos);
                 doc.text(product.name, 40, yPos);
                 doc.text(`Rp ${product.price.toLocaleString('id-ID')}`, 120, yPos);
-                doc.text(`Rp ${subtotal.toLocaleString('id-ID')}`, 165, yPos);
+                doc.text(`Rp ${itemTotal.toLocaleString('id-ID')}`, 165, yPos);
                 yPos += 7;
             }
         });
@@ -131,8 +157,23 @@ document.addEventListener('DOMContentLoaded', () => {
         doc.line(15, yPos, 195, yPos);
         yPos += 7;
         doc.setFont('helvetica', 'bold');
-        doc.text('Total Harga:', 120, yPos);
-        doc.text(`Rp ${totalPrice.toLocaleString('id-ID')}`, 165, yPos);
+        doc.text('Subtotal:', 120, yPos);
+        doc.text(`Rp ${subtotal.toLocaleString('id-ID')}`, 165, yPos);
+        yPos += 7;
+
+        let finalTotal = subtotal;
+        if (appliedDiscount > 0) {
+            const discountAmount = subtotal * (appliedDiscount / 100);
+            finalTotal = subtotal - discountAmount;
+            doc.setFont('helvetica', 'normal');
+            doc.text(`Diskon (${appliedDiscount}%):`, 120, yPos);
+            doc.text(`- Rp ${discountAmount.toLocaleString('id-ID')}`, 165, yPos);
+            yPos += 7;
+        }
+
+        doc.setFont('helvetica', 'bold');
+        doc.text('Total Akhir:', 120, yPos);
+        doc.text(`Rp ${finalTotal.toLocaleString('id-ID')}`, 165, yPos);
 
         yPos += 15;
         doc.setFont('helvetica', 'italic');
@@ -190,17 +231,33 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- CART LOGIC ---
     const updateCartTotals = () => {
         const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-        const totalPrice = cart.reduce((sum, item) => {
+        const subtotal = cart.reduce((sum, item) => {
             const product = allProducts.find(p => p.id === item.id);
             return sum + (product ? product.price * item.quantity : 0);
         }, 0);
+
         if (cartCountEl) cartCountEl.textContent = `(${totalItems})`;
-        if (cartTotalPriceEl) cartTotalPriceEl.textContent = `Rp ${totalPrice.toLocaleString('id-ID')}`;
+
+        if (appliedDiscount > 0) {
+            const discountAmount = subtotal * (appliedDiscount / 100);
+            const finalTotal = subtotal - discountAmount;
+            discountDisplay.innerHTML = `
+                <span>Diskon (${appliedDiscount}%)</span>
+                <span>- Rp ${discountAmount.toLocaleString('id-ID')}</span>
+            `;
+            cartTotalPriceEl.innerHTML = `Rp ${finalTotal.toLocaleString('id-ID')}`;
+        } else {
+            discountDisplay.innerHTML = '';
+            cartTotalPriceEl.innerHTML = `Rp ${subtotal.toLocaleString('id-ID')}`;
+        }
     };
     const updateCartUI = () => {
         if (!cartItemsContainerEl) return;
         if (cart.length === 0) {
             cartItemsContainerEl.innerHTML = '<p class="cart-empty-msg">Keranjang Anda kosong.</p>';
+            appliedDiscount = 0;
+            if(claimDiscountBtn) claimDiscountBtn.disabled = false;
+            if(discountDisplay) discountDisplay.innerHTML = '';
         } else {
             cartItemsContainerEl.innerHTML = cart.map(item => {
                 const product = allProducts.find(p => p.id === item.id);
@@ -407,6 +464,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (checkoutBtn) checkoutBtn.addEventListener('click', handleCheckout);
+        if (claimDiscountBtn) claimDiscountBtn.addEventListener('click', handleClaimDiscount);
     };
 
     // --- INITIALIZATION ---
